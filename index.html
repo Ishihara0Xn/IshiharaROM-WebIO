@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IshiharaROM - Samsung Custom ROM</title>
+    <style>
+        @font-face {
+            font-family: 'Samsung Sans';
+            src: url('samsungsans.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Samsung Sans', sans-serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+        }
+
+        .lava-lamp {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.7;
+            animation: float 15s infinite ease-in-out;
+        }
+
+        .lava-lamp:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: #ff0055;
+            top: 20%;
+            left: 10%;
+            animation-delay: 0s;
+        }
+
+        .lava-lamp:nth-child(2) {
+            width: 400px;
+            height: 400px;
+            background: #00ffaa;
+            top: 60%;
+            left: 25%;
+            animation-delay: -5s;
+        }
+
+        .lava-lamp:nth-child(3) {
+            width: 350px;
+            height: 350px;
+            background: #5500ff;
+            top: 30%;
+            left: 70%;
+            animation-delay: -10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0);
+            }
+            25% {
+                transform: translate(50px, 50px);
+            }
+            50% {
+                transform: translate(-50px, 50px);
+            }
+            75% {
+                transform: translate(-50px, -50px);
+            }
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+            z-index: 1;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            background: linear-gradient(90deg, #ff0055, #00ffaa, #5500ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: rgb-shift 8s infinite;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+        }
+
+        @keyframes rgb-shift {
+            0% {
+                filter: hue-rotate(0deg);
+            }
+            100% {
+                filter: hue-rotate(360deg);
+            }
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 3rem;
+            color: #aaa;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+        }
+
+        .nav-dots {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .dot {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .dot:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .dot::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+                transparent, 
+                rgba(255, 255, 255, 0.3), 
+                transparent);
+            transform: rotate(45deg);
+            animation: shine 3s infinite;
+        }
+
+        @keyframes shine {
+            0% {
+                left: -50%;
+            }
+            100% {
+                left: 150%;
+            }
+        }
+
+        .dot-label {
+            font-size: 0.9rem;
+            position: absolute;
+            bottom: -25px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            color: #fff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.5);
+        }
+
+        .dot:hover .dot-label {
+            opacity: 1;
+        }
+
+        .coming-soon {
+            margin-top: 5rem;
+            font-size: 1.2rem;
+            color: #888;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 0.5;
+            }
+            50% {
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+            }
+            
+            .nav-dots {
+                flex-direction: column;
+                align-items: center;
+                gap: 3rem;
+            }
+            
+            .dot {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="background">
+        <div class="lava-lamp"></div>
+        <div class="lava-lamp"></div>
+        <div class="lava-lamp"></div>
+    </div>
+
+    <div class="container">
+        <h1>IshiharaROM</h1>
+        <p class="subtitle">For Snapdragon 865 Lineup</p>
+        
+        <div class="nav-dots">
+            <div class="dot" onclick="location.href='screenshots.html'">
+                <div class="dot-label">Screenshots</div>
+            </div>
+            <div class="dot" onclick="location.href='downloads.html'">
+                <div class="dot-label">Downloads</div>
+            </div>
+            <div class="dot" onclick="location.href='about.html'">
+                <div class="dot-label">About</div>
+            </div>
+        </div>
+        
+        <p class="coming-soon">Website is still in construction!</p>
+    </div>
+
+    <script>
+        // Add RGB color cycling to dots
+        const dots = document.querySelectorAll('.dot');
+        
+        function cycleDotColors() {
+            dots.forEach((dot, index) => {
+                const hue = (Date.now() / 1000 + index * 120) % 360;
+                dot.style.boxShadow = `0 0 20px hsla(${hue}, 100%, 50%, 0.7)`;
+                dot.style.borderColor = `hsla(${hue}, 100%, 70%, 0.5)`;
+            });
+            requestAnimationFrame(cycleDotColors);
+        }
+        
+        cycleDotColors();
+        
+        // Add floating animation to container
+        const container = document.querySelector('.container');
+        let floatX = 0;
+        let floatY = 0;
+        let targetX = 0;
+        let targetY = 0;
+        
+        function updateFloatPosition() {
+            // Smoothly move toward target
+            floatX += (targetX - floatX) * 0.05;
+            floatY += (targetY - floatY) * 0.05;
+            
+            container.style.transform = `translate(${floatX}px, ${floatY}px)`;
+            
+            // Change target occasionally
+            if (Math.random() < 0.02) {
+                targetX = (Math.random() - 0.5) * 20;
+                targetY = (Math.random() - 0.5) * 20;
+            }
+            
+            requestAnimationFrame(updateFloatPosition);
+        }
+        
+        updateFloatPosition();
+    </script>
+</body>
+</html>
