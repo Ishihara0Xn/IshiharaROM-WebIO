@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IshiharaROM - Screenshots</title>
+    <style>
+        @font-face {
+            font-family: 'Samsung Sans';
+            src: url('samsungsans.ttf') format('truetype');
+            font-weight: bold;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Samsung Sans', sans-serif;
+            background: #000;
+            color: #fff;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            z-index: -1;
+        }
+
+        .lava-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            overflow: hidden;
+        }
+
+        .lava-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50vw, 25vh) scale(1.2); }
+            50% { transform: translate(25vw, 50vh) scale(0.8); }
+            75% { transform: translate(-25vw, 75vh) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .container {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            background: linear-gradient(90deg, #ff0055, #00ffaa, #5500ff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: hue-rotate 8s linear infinite;
+            margin-bottom: 1rem;
+        }
+
+        @keyframes hue-rotate {
+            to { filter: hue-rotate(360deg); }
+        }
+
+        /* Version selector */
+        .version-selector {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .version-btn {
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: white;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+        }
+
+        .version-btn.active {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        /* Image viewer */
+        .image-viewer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            aspect-ratio: 9/16;
+            border-radius: 20px;
+            overflow: hidden;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+
+        .viewer-image {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: none;
+        }
+
+        .viewer-image.active {
+            display: block;
+        }
+
+        /* Navigation controls */
+        .viewer-controls {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .control-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Thumbnail grid */
+        .thumbnail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .thumbnail {
+            width: 100%;
+            aspect-ratio: 9/16;
+            object-fit: cover;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .thumbnail:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        /* Navigation */
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-top: auto;
+            padding-bottom: 2rem;
+        }
+
+        .nav-btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-size: 1.1rem;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-btn::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            border-radius: 50px;
+            background: linear-gradient(45deg, #ff0055, #00ffaa, #5500ff);
+            background-size: 200% 200%;
+            z-index: -1;
+            animation: gradient-shift 4s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Audio control */
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            .thumbnail-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+            
+            .version-selector {
+                gap: 0.5rem;
+            }
+            
+            .version-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Background elements -->
+    <div class="lava-bg">
+        <div class="lava-blob" style="background: #ff0055; width: 400px; height: 400px; animation-delay: 0s;"></div>
+        <div class="lava-blob" style="background: #00ffaa; width: 500px; height: 500px; animation-delay: -5s;"></div>
+        <div class="lava-blob" style="background: #5500ff; width: 350px; height: 350px; animation-delay: -10s;"></div>
+    </div>
+    
+    <div class="blur-overlay"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <div class="header">
+            <h1>Screenshots</h1>
+        </div>
+        
+        <!-- Version selector -->
+        <div class="version-selector">
+            <button class="version-btn active" data-version="13">One UI 5</button>
+            <button class="version-btn" data-version="14">One UI 6</button>
+            <button class="version-btn" data-version="15">One UI 7</button>
+        </div>
+        
+        <!-- Image viewer -->
+        <div class="image-viewer">
+            <img class="viewer-image" id="currentImage" alt="Screenshot">
+        </div>
+        
+        <!-- Viewer controls -->
+        <div class="viewer-controls">
+            <button class="control-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+            <button class="control-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <!-- Thumbnail grid -->
+        <div class="thumbnail-grid" id="thumbnailGrid"></div>
+        
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="window.location.href='index.html'">Home</button>
+            <button class="nav-btn" onclick="window.location.href='downloads.html'">Downloads</button>
+            <button class="nav-btn" onclick="window.location.href='about.html'">About</button>
+        </div>
+    </div>
+
+    <!-- Audio control -->
+    <div class="audio-control" id="audioControl">
+        <i class="fas fa-play"></i>
+    </div>
+
+    <audio id="audioPlayer" loop>
+        <source src="tone.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Audio state management
+        const audio = document.getElementById('audioPlayer');
+        const audioControl = document.getElementById('audioControl');
+        
+        // Load audio state from localStorage
+        const savedAudioState = localStorage.getItem('ishiharaAudioState');
+        if (savedAudioState) {
+            const { isPlaying, currentTime } = JSON.parse(savedAudioState);
+            audio.currentTime = currentTime || 0;
+            if (isPlaying) {
+                audio.play().then(() => {
+                    audioControl.innerHTML = '<i class="fas fa-pause"></i>';
+                }).catch(e => console.log("Autoplay prevented:", e));
+            }
+        }
+        
+        // Save state before navigating
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                localStorage.setItem('ishiharaAudioState', JSON.stringify({
+                    isPlaying: !audio.paused,
+                    currentTime: audio.currentTime
+                }));
+            });
+        });
+        
+        // Toggle play/pause
+        audioControl.addEventListener('click', () => {
+            if (audio.paused) {
+                audio.play();
+                audioControl.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                audio.pause();
+                audioControl.innerHTML = '<i class="fas fa-play"></i>';
+            }
+        });
+
+        // Image viewer functionality
+        const versionBtns = document.querySelectorAll('.version-btn');
+        const thumbnailGrid = document.getElementById('thumbnailGrid');
+        const currentImage = document.getElementById('currentImage');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        let currentVersion = '13';
+        let currentImages = [];
+        let currentIndex = 0;
+        
+        // Version selection
+        versionBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                versionBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentVersion = btn.dataset.version;
+                loadImages(currentVersion);
+            });
+        });
+        
+        // Load images from GitHub directory
+        async function loadImages(version) {
+            thumbnailGrid.innerHTML = '<div class="loading">Loading...</div>';
+            currentImages = [];
+            
+            try {
+                // Fetch image list from GitHub API
+                const res = await fetch(`https://api.github.com/repos/ishihara0xn/IshiharaROM-WebIO/contents/res/${version}`);
+                const files = await res.json();
+                
+                // Filter for image files
+                const imageFiles = files.filter(file => 
+                    file.name.match(/\.(jpg|jpeg|png|gif)$/i)
+                    .sort((a, b) => a.name.localeCompare(b.name));
+                
+                if (imageFiles.length === 0) {
+                    thumbnailGrid.innerHTML = '<div class="no-images">No screenshots found for this version</div>';
+                    currentImage.style.display = 'none';
+                    return;
+                }
+                
+                currentImages = imageFiles;
+                currentIndex = 0;
+                displayThumbnails();
+                displayCurrentImage();
+            } catch (error) {
+                console.error("Error loading images:", error);
+                thumbnailGrid.innerHTML = '<div class="error">Failed to load screenshots</div>';
+            }
+        }
+        
+        // Display thumbnails
+        function displayThumbnails() {
+            thumbnailGrid.innerHTML = '';
+            
+            currentImages.forEach((image, index) => {
+                const img = document.createElement('img');
+                img.src = image.download_url;
+                img.alt = image.name;
+                img.classList.add('thumbnail');
+                if (index === currentIndex) {
+                    img.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+                }
+                img.addEventListener('click', () => {
+                    currentIndex = index;
+                    displayCurrentImage();
+                    highlightThumbnail();
+                });
+                thumbnailGrid.appendChild(img);
+            });
+        }
+        
+        // Display current image in viewer
+        function displayCurrentImage() {
+            if (currentImages.length === 0) return;
+            
+            currentImage.src = currentImages[currentIndex].download_url;
+            currentImage.classList.add('active');
+        }
+        
+        // Highlight current thumbnail
+        function highlightThumbnail() {
+            const thumbnails = document.querySelectorAll('.thumbnail');
+            thumbnails.forEach((thumb, index) => {
+                if (index === currentIndex) {
+                    thumb.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+                } else {
+                    thumb.style.border = 'none';
+                }
+            });
+        }
+        
+        // Navigation controls
+        prevBtn.addEventListener('click', () => {
+            if (currentImages.length === 0) return;
+            currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+            displayCurrentImage();
+            highlightThumbnail();
+        });
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentImages.length === 0) return;
+            currentIndex = (currentIndex + 1) % currentImages.length;
+            displayCurrentImage();
+            highlightThumbnail();
+        });
+        
+        // Load initial images
+        loadImages(currentVersion);
+    </script>
+</body>
+</html>
