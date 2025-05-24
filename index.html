@@ -8,8 +8,7 @@
         @font-face {
             font-family: 'Samsung Sans';
             src: url('samsungsans.ttf') format('truetype');
-            font-weight: normal;
-            font-style: normal;
+            font-weight: bold;
         }
 
         * {
@@ -22,315 +21,276 @@
             font-family: 'Samsung Sans', sans-serif;
             background: #000;
             color: #fff;
-            overflow: hidden;
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .visualizer-container {
+        /* Aesthetic blur overlay */
+        .blur-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(15px);
+            z-index: -1;
+        }
+
+        /* Lava lamp background */
+        .lava-bg {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             z-index: -2;
+            overflow: hidden;
         }
 
-        .lava-lamp {
+        .lava-blob {
             position: absolute;
             border-radius: 50%;
-            filter: blur(80px);
-            opacity: 1.0;
-            animation: float 25s infinite ease-in-out;
-            mix-blend-mode: screen;
+            filter: blur(60px);
+            opacity: 0.6;
+            animation: float 15s infinite linear;
         }
 
         @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            25% { transform: translate(50px, 80px) rotate(10deg); }
-            50% { transform: translate(-80px, 50px) rotate(-10deg); }
-            75% { transform: translate(-50px, -80px) rotate(5deg); }
+            0% { transform: translate(0, 0) scale(1); }
+            25% { transform: translate(50vw, 25vh) scale(1.2); }
+            50% { transform: translate(25vw, 50vh) scale(0.8); }
+            75% { transform: translate(-25vw, 75vh) scale(1.1); }
+            100% { transform: translate(0, 0) scale(1); }
         }
 
-        .main-container {
-            position: relative;
-            width: 100%;
-            max-width: 1200px;
+        /* Main content */
+        .container {
             padding: 2rem;
-            z-index: 10;
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .header {
+            text-align: center;
+            margin-top: 3rem;
+            margin-bottom: 4rem;
         }
 
         h1 {
-            font-size: 5rem;
-            text-align: center;
-            margin-bottom: 3rem;
-            background: linear-gradient(90deg, 
-                #ff0055, #00ffaa, #5500ff, #ff00ff, #ffff00);
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            background: linear-gradient(90deg, #ff0055, #00ffaa, #5500ff);
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
-            animation: rgb-shift 8s linear infinite;
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            letter-spacing: -3px;
+            animation: hue-rotate 8s linear infinite;
+            margin-bottom: 1rem;
         }
 
-        @keyframes rgb-shift {
-            0% { filter: hue-rotate(0deg); }
-            100% { filter: hue-rotate(360deg); }
+        @keyframes hue-rotate {
+            to { filter: hue-rotate(360deg); }
         }
 
-        .nav-pills {
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-            align-items: center;
-            margin-top: 4rem;
+        .subtitle {
+            font-size: clamp(1rem, 3vw, 1.5rem);
+            color: rgba(255, 255, 255, 0.7);
         }
 
-        .pill {
-            width: 200px;
-            height: 80px;
-            border-radius: 50px;
-            background: rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            border: 2px solid transparent;
+        /* Horizontal nav buttons */
+        .nav-buttons {
             display: flex;
             justify-content: center;
-            align-items: center;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin: 3rem 0;
+        }
+
+        .nav-btn {
+            padding: 1rem 2rem;
+            border-radius: 50px;
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: white;
+            font-family: inherit;
+            font-size: 1.1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
-            font-size: 1.5rem;
-            font-weight: bold;
-            letter-spacing: 2px;
-            z-index: 1;
+            transition: all 0.3s ease;
+            min-width: 180px;
+            text-align: center;
+            backdrop-filter: blur(5px);
         }
 
-        .pill::before {
+        .nav-btn::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                45deg, 
-                transparent, 
-                rgba(255, 255, 255, 0.4), 
-                transparent
-            );
-            transform: rotate(45deg);
-            animation: shine 4s infinite;
-            z-index: -1;
-        }
-
-        .pill::after {
-            content: '';
-            position: absolute;
-            inset: 0;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
             border-radius: 50px;
-            padding: 2px;
-            background: linear-gradient(
-                135deg, 
-                #ff0055, #00ffaa, #5500ff
-            );
-            -webkit-mask: 
-                linear-gradient(#fff 0 0) content-box, 
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: border-glow 3s linear infinite;
-            z-index: -2;
+            background: linear-gradient(45deg, #ff0055, #00ffaa, #5500ff);
+            background-size: 200% 200%;
+            z-index: -1;
+            animation: gradient-shift 4s ease infinite;
         }
 
-        @keyframes shine {
-            0% { left: -100%; }
-            100% { left: 100%; }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        @keyframes border-glow {
-            0% { filter: hue-rotate(0deg); opacity: 0.8; }
-            50% { opacity: 1; }
-            100% { filter: hue-rotate(360deg); opacity: 0.8; }
-        }
-
-        .pill:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 50px rgba(255, 255, 255, 0.3);
-        }
-
-        .audio-control {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: blur(10px);
+        /* Social links */
+        .social-links {
             display: flex;
             justify-content: center;
+            gap: 2rem;
+            margin-top: auto;
+            padding-bottom: 2rem;
+        }
+
+        .social-link {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
             align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .social-link img {
+            width: 60%;
+            height: 60%;
+            object-fit: contain;
+        }
+
+        /* Audio control (always visible) */
+        .audio-control {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             z-index: 100;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .audio-control i {
-            font-size: 1.5rem;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .nav-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .nav-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .lava-blob {
+                filter: blur(40px);
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <canvas id="visualizer" class="visualizer-container"></canvas>
+    <!-- Background elements -->
+    <div class="lava-bg">
+        <div class="lava-blob" style="background: #ff0055; width: 400px; height: 400px; animation-delay: 0s;"></div>
+        <div class="lava-blob" style="background: #00ffaa; width: 500px; height: 500px; animation-delay: -5s;"></div>
+        <div class="lava-blob" style="background: #5500ff; width: 350px; height: 350px; animation-delay: -10s;"></div>
+    </div>
+    
+    <div class="blur-overlay"></div>
 
-    <!-- Lava Lamp Background -->
-    <div class="lava-lamp" style="background: #ff0055; width: 400px; height: 400px; top: 20%; left: 10%; animation-delay: 0s;"></div>
-    <div class="lava-lamp" style="background: #00ffaa; width: 500px; height: 500px; top: 60%; left: 20%; animation-delay: -5s;"></div>
-    <div class="lava-lamp" style="background: #5500ff; width: 350px; height: 350px; top: 30%; left: 70%; animation-delay: -10s;"></div>
-    <div class="lava-lamp" style="background: #ff00ff; width: 450px; height: 450px; top: 70%; left: 80%; animation-delay: -15s;"></div>
-    <div class="lava-lamp" style="background: #ffff00; width: 300px; height: 300px; top: 10%; left: 60%; animation-delay: -20s;"></div>
-
-    <div class="main-container">
-        <h1>IshiharaROM</h1>
+    <!-- Main content -->
+    <div class="container">
+        <div class="header">
+            <h1>IshiharaROM</h1>
+            <p class="subtitle">Premium Samsung Custom ROM</p>
+        </div>
         
-        <div class="nav-pills">
-            <div class="pill" onclick="window.location.href='downloads.html'">
-                Downloads
-            </div>
-            <div class="pill" onclick="window.location.href='screenshots.html'">
-                Screenshots
-            </div>
-            <div class="pill" onclick="window.location.href='about.html'">
-                About
-            </div>
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="window.location.href='downloads.html'">Downloads</button>
+            <button class="nav-btn" onclick="window.location.href='screenshots.html'">Screenshots</button>
+            <button class="nav-btn" onclick="window.location.href='about.html'">About</button>
+        </div>
+        
+        <div class="social-links">
+            <a href="https://github.com/yourusername" class="social-link" target="_blank">
+                <img src="https://simpleicons.org/icons/github.svg" alt="GitHub">
+            </a>
+            <a href="https://t.me/yourchannel" class="social-link" target="_blank">
+                <img src="https://simpleicons.org/icons/telegram.svg" alt="Telegram">
+            </a>
         </div>
     </div>
 
+    <!-- Audio player -->
     <div class="audio-control" id="audioControl">
-        <i class="fas fa-play"></i>
+        <i class="fas fa-pause"></i>
     </div>
 
-    <audio id="audioPlayer" loop>
+    <audio id="audioPlayer" loop autoplay>
         <source src="tone.mp3" type="audio/mpeg">
     </audio>
 
     <script>
-        // Audio Visualizer
+        // Auto-play audio with fade-in
         const audio = document.getElementById('audioPlayer');
         const audioControl = document.getElementById('audioControl');
-        let audioContext, analyser, dataArray, canvas, ctx;
-        let isPlaying = false;
-
-        // Set up visualizer
-        function initVisualizer() {
-            canvas = document.getElementById('visualizer');
-            ctx = canvas.getContext('2d');
-            
-            // Set canvas to full window
-            function resizeCanvas() {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+        
+        // Start with volume 0 and fade in
+        audio.volume = 0;
+        let fadeInterval = setInterval(() => {
+            if (audio.volume < 0.7) {
+                audio.volume += 0.05;
+            } else {
+                clearInterval(fadeInterval);
             }
-            window.addEventListener('resize', resizeCanvas);
-            resizeCanvas();
+        }, 100);
 
-            audioContext = new (window.AudioContext || window.webkitAudioContext)();
-            const source = audioContext.createMediaElementSource(audio);
-            analyser = audioContext.createAnalyser();
-            analyser.fftSize = 256;
-            source.connect(analyser);
-            analyser.connect(audioContext.destination);
-            
-            dataArray = new Uint8Array(analyser.frequencyBinCount);
-            
-            drawVisualizer();
-        }
-
-        function drawVisualizer() {
-            requestAnimationFrame(drawVisualizer);
-            
-            analyser.getByteFrequencyData(dataArray);
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            
-            // Draw bars with glow effect
-            const barWidth = (canvas.width / dataArray.length) * 2.5;
-            let x = 0;
-            
-            for(let i = 0; i < dataArray.length; i++) {
-                const barHeight = dataArray[i] / 2;
-                const hue = i * 360 / dataArray.length;
-                
-                // Create glow effect
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = `hsla(${hue}, 100%, 50%, 0.7)`;
-                
-                // Draw bar
-                ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.8)`;
-                ctx.fillRect(
-                    x, 
-                    canvas.height - barHeight, 
-                    barWidth, 
-                    barHeight
-                );
-                
-                // Mirror effect
-                ctx.fillStyle = `hsla(${hue}, 100%, 50%, 0.3)`;
-                ctx.fillRect(
-                    x, 
-                    canvas.height, 
-                    barWidth, 
-                    barHeight / 3
-                );
-                
-                x += barWidth + 1;
-            }
-        }
-
-        // Audio control
-        audioControl.addEventListener('click', function() {
-            if (!isPlaying) {
+        // Toggle play/pause
+        audioControl.addEventListener('click', () => {
+            if (audio.paused) {
                 audio.play();
-                if (!audioContext) initVisualizer();
-                this.innerHTML = '<i class="fas fa-pause"></i>';
-                isPlaying = true;
+                audioControl.innerHTML = '<i class="fas fa-pause"></i>';
             } else {
                 audio.pause();
-                this.innerHTML = '<i class="fas fa-play"></i>';
-                isPlaying = false;
+                audioControl.innerHTML = '<i class="fas fa-play"></i>';
             }
         });
 
-        // Enhanced lava lamp animation
-        document.querySelectorAll('.lava-lamp').forEach(lamp => {
-            const duration = 15 + Math.random() * 20;
-            lamp.style.animationDuration = `${duration}s`;
-            
-            // Random glow color changes
-            setInterval(() => {
-                const hue = Math.floor(Math.random() * 360);
-                lamp.style.filter = `blur(80px) hue-rotate(${hue}deg)`;
-            }, 5000);
-        });
-
-        // Pill hover effects
-        document.querySelectorAll('.pill').forEach(pill => {
-            pill.addEventListener('mouseenter', () => {
-                const hue = Math.floor(Math.random() * 360);
-                pill.style.boxShadow = `0 0 50px hsla(${hue}, 100%, 50%, 0.5)`;
-                pill.querySelector('i').style.color = `hsl(${hue}, 100%, 50%)`;
-            });
-            
-            pill.addEventListener('mouseleave', () => {
-                pill.style.boxShadow = '0 0 30px rgba(255, 255, 255, 0.1)';
-                pill.querySelector('i').style.color = '';
-            });
+        // Pause audio when tab is inactive
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                audioControl.innerHTML = '<i class="fas fa-play"></i>';
+            }
         });
     </script>
 </body>
