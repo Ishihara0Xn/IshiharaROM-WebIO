@@ -115,6 +115,7 @@
         .version-btn.active {
             background: rgba(255, 255, 255, 0.1);
             border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
         }
 
         /* Image viewer */
@@ -131,6 +132,7 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .viewer-image {
@@ -138,10 +140,17 @@
             max-height: 100%;
             object-fit: contain;
             display: none;
+            border-radius: 15px;
         }
 
         .viewer-image.active {
             display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
         /* Navigation controls */
@@ -153,8 +162,8 @@
         }
 
         .control-btn {
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.1);
             border: none;
@@ -165,10 +174,12 @@
             align-items: center;
             justify-content: center;
             transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .control-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
         }
 
         /* Thumbnail grid */
@@ -187,11 +198,17 @@
             cursor: pointer;
             transition: all 0.3s ease;
             background: rgba(255, 255, 255, 0.05);
+            border: 2px solid transparent;
         }
 
         .thumbnail:hover {
             transform: scale(1.05);
             box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+        }
+
+        .thumbnail.active {
+            border: 2px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
         }
 
         /* Navigation */
@@ -246,8 +263,8 @@
             position: fixed;
             bottom: 20px;
             right: 20px;
-            width: 50px;
-            height: 50px;
+            width: 60px;
+            height: 60px;
             border-radius: 50%;
             background: rgba(0, 0, 0, 0.5);
             display: flex;
@@ -256,11 +273,24 @@
             cursor: pointer;
             z-index: 100;
             border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .audio-control i {
+            font-size: 1.5rem;
+        }
+
+        /* Status messages */
+        .status-message {
+            text-align: center;
+            padding: 2rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 1.2rem;
         }
 
         @media (max-width: 768px) {
             .thumbnail-grid {
-                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
             }
             
             .version-selector {
@@ -271,25 +301,123 @@
                 padding: 0.6rem 1rem;
                 font-size: 0.9rem;
             }
-        }
-        
-        .loading-message {
-            text-align: center;
-            padding: 2rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 1.2rem;
+            
+            .control-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.2rem;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Background elements -->
-   <script>
-        // Enhanced Audio Manager
+    <div class="lava-bg">
+        <div class="lava-blob" style="background: #ff0055; width: 400px; height: 400px; animation-delay: 0s;"></div>
+        <div class="lava-blob" style="background: #00ffaa; width: 500px; height: 500px; animation-delay: -5s;"></div>
+        <div class="lava-blob" style="background: #5500ff; width: 350px; height: 350px; animation-delay: -10s;"></div>
+    </div>
+    
+    <div class="blur-overlay"></div>
+
+    <!-- Main content -->
+    <div class="container">
+        <div class="header">
+            <h1>Screenshots</h1>
+        </div>
+        
+        <!-- Version selector -->
+        <div class="version-selector">
+            <button class="version-btn active" data-version="oneui5">One UI 5</button>
+            <button class="version-btn" data-version="oneui6">One UI 6</button>
+            <button class="version-btn" data-version="oneui7">One UI 7</button>
+        </div>
+        
+        <!-- Image viewer -->
+        <div class="image-viewer">
+            <img class="viewer-image" id="currentImage" alt="Screenshot">
+            <div class="status-message" id="statusMessage">Select a version to view screenshots</div>
+        </div>
+        
+        <!-- Viewer controls -->
+        <div class="viewer-controls">
+            <button class="control-btn" id="prevBtn"><i class="fas fa-chevron-left"></i></button>
+            <button class="control-btn" id="nextBtn"><i class="fas fa-chevron-right"></i></button>
+        </div>
+        
+        <!-- Thumbnail grid -->
+        <div class="thumbnail-grid" id="thumbnailGrid"></div>
+        
+        <!-- Navigation -->
+        <div class="nav-buttons">
+            <button class="nav-btn" onclick="navigateTo('index.html')">Home</button>
+            <button class="nav-btn" onclick="navigateTo('downloads.html')">Downloads</button>
+            <button class="nav-btn" onclick="navigateTo('about.html')">About</button>
+        </div>
+    </div>
+
+    <!-- Audio control -->
+    <div class="audio-control" id="audioControl">
+        <i class="fas fa-play"></i>
+    </div>
+
+    <audio id="audioPlayer" loop>
+        <source src="tone.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // =============================================
+        // ADD YOUR IMAGE LINKS HERE (10 per version)
+        // Format: { version: [url1, url2, ...], ... }
+        // Leave empty string for unused slots
+        // =============================================
+        const imageDatabase = {
+            oneui5: [
+                "https://example.com/oneui5/screenshot1.jpg",
+                "https://example.com/oneui5/screenshot2.jpg",
+                "", // Empty slot
+                "https://example.com/oneui5/screenshot4.jpg",
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                ""  // Empty slot
+            ],
+            oneui6: [
+                "https://example.com/oneui6/screenshot1.jpg",
+                "https://example.com/oneui6/screenshot2.jpg",
+                "https://example.com/oneui6/screenshot3.jpg",
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                ""  // Empty slot
+            ],
+            oneui7: [
+                "https://example.com/oneui7/screenshot1.jpg",
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                "", // Empty slot
+                ""  // Empty slot
+            ]
+        };
+        // =============================================
+        // END OF IMAGE LINKS CONFIGURATION
+        // =============================================
+
+        // Audio Manager
         class AudioManager {
             static init() {
                 this.audio = document.getElementById('audioPlayer');
-                this.audio.volume = 0.7;
                 this.control = document.getElementById('audioControl');
                 
                 // Load saved state
@@ -298,22 +426,28 @@
                     const { isPlaying, currentTime } = JSON.parse(savedState);
                     this.audio.currentTime = currentTime || 0;
                     if (isPlaying) {
-                        this.audio.play().catch(e => console.log("Autoplay prevented"));
-                        this.control.innerHTML = '<i class="fas fa-pause"></i>';
+                        this.playAudio();
                     }
                 }
-                
-                // Save state before unload
-                window.addEventListener('beforeunload', () => this.saveState());
                 
                 // Control click handler
                 this.control.addEventListener('click', () => this.togglePlayback());
             }
             
+            static playAudio() {
+                this.audio.play()
+                    .then(() => {
+                        this.control.innerHTML = '<i class="fas fa-pause"></i>';
+                    })
+                    .catch(e => {
+                        console.log("Audio play prevented:", e);
+                        this.control.innerHTML = '<i class="fas fa-play"></i>';
+                    });
+            }
+            
             static togglePlayback() {
                 if (this.audio.paused) {
-                    this.audio.play();
-                    this.control.innerHTML = '<i class="fas fa-pause"></i>';
+                    this.playAudio();
                 } else {
                     this.audio.pause();
                     this.control.innerHTML = '<i class="fas fa-play"></i>';
@@ -329,18 +463,16 @@
             }
         }
 
-        // Initialize audio when DOM loads
-        document.addEventListener('DOMContentLoaded', () => AudioManager.init());
-
-        // Enhanced Image Viewer
+        // Screenshot Viewer
         class ScreenshotViewer {
             constructor() {
                 this.versionBtns = document.querySelectorAll('.version-btn');
                 this.thumbnailGrid = document.getElementById('thumbnailGrid');
                 this.currentImage = document.getElementById('currentImage');
+                this.statusMessage = document.getElementById('statusMessage');
                 this.prevBtn = document.getElementById('prevBtn');
                 this.nextBtn = document.getElementById('nextBtn');
-                this.currentVersion = '13';
+                this.currentVersion = 'oneui5';
                 this.currentImages = [];
                 this.currentIndex = 0;
                 
@@ -366,68 +498,59 @@
                 this.loadImages();
             }
             
-            async loadImages() {
-                this.thumbnailGrid.innerHTML = '<div class="loading-message">Loading screenshots...</div>';
+            loadImages() {
+                this.thumbnailGrid.innerHTML = '';
                 this.currentImages = [];
+                this.currentIndex = 0;
                 
-                try {
-                    // Direct image links (bypass GitHub API)
-                    const imageUrls = this.getImageUrls(this.currentVersion);
-                    
-                    if (imageUrls.length === 0) {
-                        this.showNoImagesMessage();
-                        return;
-                    }
-                    
-                    this.currentImages = imageUrls;
-                    this.currentIndex = 0;
-                    this.displayThumbnails();
-                    this.displayCurrentImage();
-                } catch (error) {
-                    console.error("Error loading images:", error);
-                    this.thumbnailGrid.innerHTML = '<div class="loading-message">Failed to load screenshots</div>';
+                // Get images for current version (filter out empty strings)
+                const versionImages = imageDatabase[this.currentVersion].filter(url => url);
+                
+                if (versionImages.length === 0) {
+                    this.showNoImages();
+                    return;
                 }
-            }
-            
-            getImageUrls(version) {
-                // Manually construct image URLs (adjust to your repo structure)
-                const baseUrl = 'https://raw.githubusercontent.com/ishihara0xn/IshiharaROM-WebIO/main/res/';
-                const imageNames = [
-                    'screenshot1.png',
-                    'screenshot2.png',
-                    'screenshot3.png',
-                    // Add all your screenshot filenames
-                ];
                 
-                return imageNames.map(name => ({
-                    url: `${baseUrl}${version}/${name}`,
-                    name: name
-                })).filter(img => {
-                    // Only include images that exist (you may need to adjust this)
-                    return true;
-                });
+                this.currentImages = versionImages;
+                this.displayThumbnails();
+                this.displayCurrentImage();
             }
             
-            showNoImagesMessage() {
-                this.thumbnailGrid.innerHTML = `
-                    <div class="loading-message">
-                        No screenshots found for One UI ${this.currentVersion - 12}<br>
-                        Check the GitHub repository for updates
-                    </div>`;
+            showNoImages() {
+                this.statusMessage.textContent = `No screenshots available for ${this.getVersionName(this.currentVersion)}`;
+                this.statusMessage.style.display = 'block';
                 this.currentImage.style.display = 'none';
+                this.prevBtn.style.display = 'none';
+                this.nextBtn.style.display = 'none';
+            }
+            
+            getVersionName(versionKey) {
+                const names = {
+                    'oneui5': 'One UI 5',
+                    'oneui6': 'One UI 6',
+                    'oneui7': 'One UI 7'
+                };
+                return names[versionKey] || versionKey;
             }
             
             displayThumbnails() {
                 this.thumbnailGrid.innerHTML = '';
+                this.statusMessage.style.display = 'none';
+                this.currentImage.style.display = 'block';
+                this.prevBtn.style.display = 'flex';
+                this.nextBtn.style.display = 'flex';
                 
-                this.currentImages.forEach((image, index) => {
+                this.currentImages.forEach((imageUrl, index) => {
+                    const thumbContainer = document.createElement('div');
+                    thumbContainer.className = 'thumb-container';
+                    
                     const img = document.createElement('img');
-                    img.src = image.url;
-                    img.alt = image.name;
-                    img.classList.add('thumbnail');
+                    img.src = imageUrl;
+                    img.alt = `Screenshot ${index + 1}`;
+                    img.className = 'thumbnail';
                     
                     if (index === this.currentIndex) {
-                        img.style.border = '2px solid rgba(255, 255, 255, 0.5)';
+                        img.classList.add('active');
                     }
                     
                     img.addEventListener('click', () => {
@@ -436,46 +559,61 @@
                         this.highlightThumbnail();
                     });
                     
-                    this.thumbnailGrid.appendChild(img);
+                    // Add hover preview effect
+                    img.addEventListener('mouseenter', () => {
+                        if (index !== this.currentIndex) {
+                            img.style.transform = 'scale(1.1)';
+                        }
+                    });
+                    
+                    img.addEventListener('mouseleave', () => {
+                        if (index !== this.currentIndex) {
+                            img.style.transform = 'scale(1)';
+                        }
+                    });
+                    
+                    thumbContainer.appendChild(img);
+                    this.thumbnailGrid.appendChild(thumbContainer);
                 });
             }
             
             displayCurrentImage() {
                 if (this.currentImages.length === 0) return;
                 
-                this.currentImage.src = this.currentImages[this.currentIndex].url;
-                this.currentImage.style.display = 'block';
+                this.currentImage.src = this.currentImages[this.currentIndex];
+                this.currentImage.className = 'viewer-image';
+                setTimeout(() => {
+                    this.currentImage.classList.add('active');
+                }, 10);
+                
+                this.highlightThumbnail();
             }
             
             highlightThumbnail() {
-                const thumbnails = document.querySelectorAll('.thumbnail');
-                thumbnails.forEach((thumb, index) => {
-                    thumb.style.border = index === this.currentIndex 
-                        ? '2px solid rgba(255, 255, 255, 0.5)' 
-                        : 'none';
+                document.querySelectorAll('.thumbnail').forEach((thumb, index) => {
+                    thumb.classList.toggle('active', index === this.currentIndex);
                 });
             }
             
             navigate(direction) {
                 if (this.currentImages.length === 0) return;
+                
                 this.currentIndex = (this.currentIndex + direction + this.currentImages.length) % this.currentImages.length;
                 this.displayCurrentImage();
-                this.highlightThumbnail();
             }
         }
 
-        // Initialize when DOM loads
+        // Navigation helper
+        function navigateTo(page) {
+            AudioManager.saveState();
+            window.location.href = page;
+        }
+
+        // Initialize everything when DOM loads
         document.addEventListener('DOMContentLoaded', () => {
+            AudioManager.init();
             new ScreenshotViewer();
-            
-            // Save audio state when navigating
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    AudioManager.saveState();
-                });
-            });
         });
     </script>
 </body>
 </html>
-
