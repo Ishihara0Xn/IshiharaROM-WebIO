@@ -1,0 +1,70 @@
+name: Deploy High-Performance Animated Site
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # --- Cache dependencies (for future npm/pnpm/yarn if needed) ---
+      - name: Cache node modules
+        uses: actions/cache@v3
+        id: cache-node-modules
+        with:
+          path: |
+            **/node_modules
+            ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # --- Install dependencies (future-proofing) ---
+      - name: Install Node.js (for potential build tools)
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      # --- Build step (optional, for future optimizations) ---
+      - name: Build (if using bundlers like Vite/Rollup)
+        run: |
+          if [ -f "package.json" ]; then
+            npm ci
+            npm run build
+          else
+            echo "No build step needed (static site)"
+          fi
+
+      # --- Optimize assets (optional) ---
+      - name: Optimize images (future-proofing)
+        uses: calibreapp/image-actions@main
+        if: ${{ false }} # Disabled by default (remove condition to enable)
+        with:
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          compressOnly: true
+
+      # --- Deploy ---
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ (contains(github.event.head_commit.message, '[skip build]') && 'dist') || '.' }}
+
+      - name: Deploy
+        uses: actions/deploy-pages@v4
